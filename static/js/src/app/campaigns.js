@@ -46,6 +46,7 @@ function launch() {
                     page: {
                         name: $("#page").select2("data")[0].text
                     },
+                    qrsize: $("#qrsize").val(),
                     smtp: {
                         name: $("#profile").select2("data")[0].text
                     },

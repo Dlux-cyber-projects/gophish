@@ -181,3 +181,7 @@ func (s *EmailRequest) Generate(msg *gomail.Message) error {
 func (s *EmailRequest) GetDialer() (mailer.Dialer, error) {
 	return s.SMTP.GetDialer()
 }
+
+func (s *EmailRequest) getQRSize() string {
+	return ""
+}

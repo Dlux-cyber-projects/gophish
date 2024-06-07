@@ -13,6 +13,7 @@ import (
 type TemplateContext interface {
 	getFromAddress() string
 	getBaseURL() string
+	getQRSize() string
 }
 
 // PhishingTemplateContext is the context that is sent to any template, such
@@ -24,6 +25,9 @@ type PhishingTemplateContext struct {
 	TrackingURL string
 	RId         string
 	BaseURL     string
+	QRBase64    string
+	QRName      string
+	QR          string
 	BaseRecipient
 }
 
@@ -61,6 +65,18 @@ func NewPhishingTemplateContext(ctx TemplateContext, r BaseRecipient, rid string
 	trackingURL.Path = path.Join(trackingURL.Path, "/track")
 	trackingURL.RawQuery = q.Encode()
 
+	qrBase64 := ""
+	qrName := ""
+	qr := ""
+	qrSize := ctx.getQRSize()
+	if qrSize != "" {
+		qrBase64, qrName, err = generateQRCode(phishURL.String(), qrSize)
+		if err != nil {
+			return PhishingTemplateContext{}, err
+		}
+		qr = "<img src=\"cid:" + qrName + "\">"
+	}
+
 	return PhishingTemplateContext{
 		BaseRecipient: r,
 		BaseURL:       baseURL.String(),
@@ -69,6 +85,9 @@ func NewPhishingTemplateContext(ctx TemplateContext, r BaseRecipient, rid string
 		Tracker:       "<img alt='' style='display: none' src='" + trackingURL.String() + "'/>",
 		From:          fn,
 		RId:           rid,
+		QRBase64:      qrBase64,
+		QRName:        qrName,
+		QR:            qr,
 	}, nil
 }
 
@@ -88,6 +107,7 @@ func ExecuteTemplate(text string, data interface{}) (string, error) {
 type ValidationContext struct {
 	FromAddress string
 	BaseURL     string
+	QRSize      string
 }
 
 func (vc ValidationContext) getFromAddress() string {
@@ -123,4 +143,8 @@ func ValidateTemplate(text string) error {
 		return err
 	}
 	return nil
+}
+
+func (vc ValidationContext) getQRSize() string {
+	return vc.QRSize
 }
