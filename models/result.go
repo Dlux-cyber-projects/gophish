@@ -172,7 +172,8 @@ func (r *Result) UpdateGeo(addr string) error {
 
 func generateResultId() (string, error) {
 	const alphaNum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	k := make([]byte, 7)
+
+	k := make([]byte, 25)
 	for i := range k {
 		idx, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphaNum))))
 		if err != nil {
